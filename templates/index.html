@@ -1,0 +1,54 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <title>PhysicsBoard</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header class="toolbar">
+        <div class="brand">PhysicsBoard</div>
+
+        <button id="pen" class="active">✏️ Ручка</button>
+        <button id="eraser">🧽 Ластик</button>
+        <button id="hand">✋ Рука</button>
+        <button id="zoom-out">−</button>
+        <span id="zoom-level">100%</span>
+        <button id="zoom-in">+</button>
+        <button id="reset-view">Сброс масштаба</button>
+
+        <label class="color-picker">
+            Цвет
+            <input type="color" id="color" value="#202020">
+        </label>
+
+        <label class="size-picker">
+            Толщина
+            <input type="range" id="size"
+                   min="1" max="12" value="3">
+        </label>
+
+        <button id="clear">Очистить</button>
+
+        <button id="copy-link">Скопировать ссылку ученику</button>
+
+        <span id="status">Подключение...</span>
+    </header>
+
+    <main>
+        <div id="board-viewport">
+    <div id="board-world">
+        <canvas id="board"></canvas>
+    </div>
+</div>
+    </main>
+
+    <script>
+        const ROOM_ID = "{{ room_id }}";
+    </script>
+    <script src="/static/board.js"></script>
+</body>
+</html>

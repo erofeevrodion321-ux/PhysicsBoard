@@ -1,0 +1,239 @@
+```html
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhysicsBoard — Мои доски</title>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 40px 20px;
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            color: #202938;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        h1 { margin: 0 0 8px; }
+        p { color: #667085; }
+
+        a { text-decoration: none; color: inherit; }
+
+        .button {
+            display: inline-block;
+            border: 0;
+            border-radius: 8px;
+            padding: 12px 18px;
+            background: #2563eb;
+            color: white;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .board-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 16px;
+        }
+
+        .board-card {
+            padding: 22px;
+            background: white;
+            border: 1px solid #e1e5ec;
+            border-radius: 12px;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        .board-card:hover {
+            box-shadow: 0 5px 18px #17203312;
+        }
+
+        .board-link {
+            display: block;
+            margin-bottom: 14px;
+        }
+
+        .board-card h2 {
+            margin: 0 0 10px;
+            font-size: 19px;
+            overflow-wrap: anywhere;
+        }
+
+        .board-card p {
+            margin: 0;
+            font-size: 13px;
+        }
+
+        .rename-button {
+            padding: 8px 12px;
+            border: 1px solid #d0d5dd;
+            border-radius: 7px;
+            background: white;
+            color: #344054;
+            cursor: pointer;
+        }
+
+        .rename-button:hover {
+            background: #f2f4f7;
+        }
+
+        .delete-button {
+        margin-left: 8px;
+        padding: 8px 12px;
+        border: 1px solid #f0b4b4;
+        border-radius: 7px;
+        background: white;
+        color: #c62828;
+        cursor: pointer;
+        }
+
+        .delete-button:hover {
+            background: #fff1f1;
+        }
+
+        .empty {
+            padding: 35px;
+            background: white;
+            border-radius: 12px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>PhysicsBoard</h1>
+                <p>Твои доски для занятий физикой</p>
+            </div>
+
+            <a class="button" href="/create">+ Создать доску</a>
+        </header>
+
+        {% if boards %}
+            <div class="board-list">
+                {% for board in boards %}
+                    <div class="board-card">
+                        <a href="/room/{{ board.id }}" class="board-link">
+                            <h2>{{ board.name }}</h2>
+                            <p>Открыть доску →</p>
+                        </a>
+
+                        <button
+                            class="rename-button"
+                            onclick="renameBoard('{{ board.id }}')"
+                        >
+                            Переименовать
+                        </button>
+                        <button
+                            class="delete-button"
+                            onclick="deleteBoard('{{ board.id }}')"
+                        >
+                            Удалить
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty">
+                <h2>Пока нет досок</h2>
+                <p>Создай первую доску, чтобы начать занятие.</p>
+                <a class="button" href="/create">
+                    Создать первую доску
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        async function renameBoard(boardId) {
+            const button = document.querySelector(
+                `.rename-button[onclick="renameBoard('${boardId}')"]`
+            );
+
+            const card = button.closest(".board-card");
+            const currentName = card.querySelector("h2").textContent;
+            const newName = prompt("Новое название доски:", currentName);
+
+            if (newName === null || !newName.trim()) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/rename/${boardId}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ name: newName.trim() })
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    alert(result.error || "Не удалось переименовать доску");
+                    return;
+                }
+
+                card.querySelector("h2").textContent = result.name;
+            } catch (error) {
+                alert("Не удалось связаться с сервером");
+            }
+        }
+        async function deleteBoard(boardId) {
+            const button = document.querySelector(
+                `.delete-button[onclick="deleteBoard('${boardId}')"]`
+            );
+
+            const card = button.closest(".board-card");
+            const name = card.querySelector("h2").textContent;
+
+            if (!confirm(`Удалить доску «${name}»? Это действие нельзя отменить.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/delete/${boardId}`, {
+                    method: "POST"
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    alert(result.error || "Не удалось удалить доску");
+                    return;
+                }
+
+                card.remove();
+
+                const boardList = document.querySelector(".board-list");
+
+                if (boardList && boardList.children.length === 0) {
+                    location.reload();
+                }
+            } catch (error) {
+                alert("Не удалось связаться с сервером");
+            }
+        }
+    </script>
+</body>
+</html>
+```

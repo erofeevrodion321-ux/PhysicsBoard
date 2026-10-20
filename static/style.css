@@ -1,0 +1,115 @@
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    color: #222;
+}
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    flex-wrap: wrap;
+    background: #f5f5f5;
+    border-bottom: 1px solid #ddd;
+    z-index: 1;
+}
+
+.brand {
+    font-weight: bold;
+    font-size: 19px;
+    margin-right: 12px;
+}
+
+button {
+    border: 1px solid #ccc;
+    background: white;
+    border-radius: 6px;
+    padding: 9px 12px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #eaeaea;
+}
+
+button.active {
+    background: #dceaff;
+    border-color: #6b9de8;
+}
+
+.color-picker,
+.size-picker {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+}
+
+#color {
+    width: 34px;
+    height: 30px;
+    border: none;
+    cursor: pointer;
+}
+
+#size {
+    width: 90px;
+}
+
+#status {
+    margin-left: auto;
+    font-size: 12px;
+    color: #666;
+}
+
+main {
+    flex: 1;
+    min-height: 0;
+    position: relative;
+    background-color: white;
+    background-image:
+        linear-gradient(#e8edf2 1px, transparent 1px),
+        linear-gradient(90deg, #e8edf2 1px, transparent 1px);
+    background-size: 24px 24px;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+    cursor: crosshair;
+    background: transparent;
+}
+#board-viewport {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+}
+
+#board-world {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 10000px;
+    height: 10000px;
+    transform-origin: 0 0;
+}
+
+#board {
+    display: block;
+    width: 10000px;
+    height: 10000px;
+    touch-action: none;
+    cursor: crosshair;
+}
